@@ -72,3 +72,27 @@ Also before starting you need to make sure that the path to various files and fo
 A slighly modified ResNet50 model (with base layers pretrained on imagenet) is used for classifying whether a face is masked properly or not. Combination of some AveragePooling2D and Dense (with dropout) layers ending with a Sigmoid or Softmax classifier is appended on top of the base layers. Different architectures can be used for the purpose, however complex ones should be avoided to reduce overfitting.
 
 For this classifier to work properly in all conditions, we need a diverse dataset that contains faces in various orientations and lighting conditions. For better results, our dataset should also cover people of different ages and gender. Finding such wide range of pictures having people wearing a face mask becomes a challenging task. Thus we need to apply numerous kinds of Augmentation before we start the training process.
+
+
+
+### Training 
+It's training time! By using Keras' ImageDataGenerator we apply augmentation on the fly. Training data now keep changing after each epoch. Rotation, Horizontal Flip, Brightness Shift are some of augmentations that can be applied. We also incorporate our blurring augmentation with some associated probabilities during the training. Implementation details can be found in this [notebook](https://github.com/rohanrao619/Social_Distancing_with_AI/blob/master/Face_Mask_Classifier.ipynb). 
+
+The model needs to be trained on tons of relevant data before we can apply it in real-time and expect it to work. It needs a lot of computational power and I mean a lot! We can try our models trained on a small dataset in our local machines, but it would not produce desirable results. We can use pretrained open-source models for now. So we use the model trained by the team of [Thang Pham](https://github.com/aome510/Mask-Classifier) for this purpose. It is basically a ResNet50 Model with a modified top.
+
+### Pipeline
+![](Pipeline.png)
+
+Implementation details can be found in this [notebook](https://github.com/rohanrao619/Social_Distancing_with_AI/blob/master/Social_Distancing_Monitor.ipynb). Some optimizations can be made in the form of vectorization. For getting the position of a person, there are various approaches. One of them being simply using the centers of the bounding boxes, the one used in this project. Other one is using OpenCV's perspective transform to get a bird's eye view of the positions, but that kind of needs pretty accurate frame of reference points. Using it also increases the complexity of the system by a bit. However if implemented correctly, it will no doubt produce better results. For now we stick to the first approach. Remember, there's always scope for improvements!
+
+### Results
+![](Results/Demo_1.gif)
+
+As we can see, the system identifies the people in the frame and their faces (if it is visible) and puts green or red bounding boxes if they are safe or not safe respectively. Status is shown in a bar at the top, showing all the details. These are pretty decent results considering the complexity of the problem we have at our hands. But we can't see if the Face Mask Classifier is working properly or not. Let's take a look at another example.
+
+![](Results/Demo_2.gif)
+
+Yes! there we have it. It is producing very neat results, detecting masked faces properly. Keep in mind that while the social distancing is pretty decently detected in these samples (2nd Example), the system is not designed for these kind of clips, and might perform terribly sometimes (As people are in different scales and the 3rd dimension of depth is completely ignored). Obviously, a top view like from a CCTV Camera is more suitable for social distancing detection (As in the 1st Example).
+
+
+For further Information You can refer the covid19 patientmonitoring pdf present
